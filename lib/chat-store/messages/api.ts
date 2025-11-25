@@ -1,11 +1,13 @@
 import { createClient } from "@/lib/supabase/client"
 import { isSupabaseEnabled } from "@/lib/supabase/config"
 import type { UIMessage as MessageAISDK } from "ai"
+import type { Attachment } from "@/lib/file-handling"
 import { readFromIndexedDB, writeToIndexedDB } from "../persist"
 
 export interface ExtendedMessageAISDK extends MessageAISDK {
   message_group_id?: string
   model?: string
+  attachments?: Attachment[]
 }
 
 export async function getMessagesFromDb(
