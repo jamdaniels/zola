@@ -86,7 +86,7 @@ export async function logUserMessage({
     chat_id: chatId,
     role: "user",
     content: sanitizeUserInput(content),
-    experimental_attachments: attachments,
+    attachments: attachments,
     user_id: userId,
     message_group_id,
   })

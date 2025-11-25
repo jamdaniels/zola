@@ -96,7 +96,7 @@ export function useChatCore({
     handleSubmit,
     status,
     error,
-    reload,
+    regenerate,
     stop,
     setMessages,
     setInput,
@@ -160,7 +160,7 @@ export function useChatCore({
       content: input,
       role: "user" as const,
       createdAt: new Date(),
-      experimental_attachments:
+      attachments:
         optimisticAttachments.length > 0 ? optimisticAttachments : undefined,
     }
 
@@ -174,14 +174,14 @@ export function useChatCore({
       const allowed = await checkLimitsAndNotify(uid)
       if (!allowed) {
         setMessages((prev) => prev.filter((m) => m.id !== optimisticId))
-        cleanupOptimisticAttachments(optimisticMessage.experimental_attachments)
+        cleanupOptimisticAttachments(optimisticMessage.attachments)
         return
       }
 
       const currentChatId = await ensureChatExists(uid, input)
       if (!currentChatId) {
         setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
-        cleanupOptimisticAttachments(optimisticMessage.experimental_attachments)
+        cleanupOptimisticAttachments(optimisticMessage.attachments)
         return
       }
 
@@ -193,7 +193,7 @@ export function useChatCore({
           status: "error",
         })
         setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
-        cleanupOptimisticAttachments(optimisticMessage.experimental_attachments)
+        cleanupOptimisticAttachments(optimisticMessage.attachments)
         return
       }
 
@@ -203,7 +203,7 @@ export function useChatCore({
         if (attachments === null) {
           setMessages((prev) => prev.filter((m) => m.id !== optimisticId))
           cleanupOptimisticAttachments(
-            optimisticMessage.experimental_attachments
+            optimisticMessage.attachments
           )
           return
         }
@@ -218,12 +218,12 @@ export function useChatCore({
           systemPrompt: systemPrompt || SYSTEM_PROMPT_DEFAULT,
           enableSearch,
         },
-        experimental_attachments: attachments || undefined,
+        attachments: attachments || undefined,
       }
 
       handleSubmit(undefined, options)
       setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
-      cleanupOptimisticAttachments(optimisticMessage.experimental_attachments)
+      cleanupOptimisticAttachments(optimisticMessage.attachments)
       cacheAndAddMessage(optimisticMessage)
       clearDraft()
 
@@ -232,7 +232,7 @@ export function useChatCore({
       }
     } catch {
       setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId))
-      cleanupOptimisticAttachments(optimisticMessage.experimental_attachments)
+      cleanupOptimisticAttachments(optimisticMessage.attachments)
       toast({ title: "Failed to send message", status: "error" })
     } finally {
       setIsSubmitting(false)
@@ -312,7 +312,7 @@ export function useChatCore({
         content: newContent,
         role: "user" as const,
         createdAt: new Date(),
-        experimental_attachments: target.experimental_attachments || undefined,
+        attachments: target.attachments || undefined,
       }
 
       try {
@@ -359,8 +359,8 @@ export function useChatCore({
             enableSearch,
             editCutoffTimestamp: cutoffIso, // Backend will delete messages from this timestamp
           },
-          experimental_attachments:
-            target.experimental_attachments || undefined,
+          attachments:
+            target.attachments || undefined,
         }
 
         // If this is an edit of the very first user message, update chat title
@@ -498,8 +498,8 @@ export function useChatCore({
       },
     }
 
-    reload(options)
-  }, [user, chatId, selectedModel, isAuthenticated, systemPrompt, reload])
+    regenerate(options)
+  }, [user, chatId, selectedModel, isAuthenticated, systemPrompt, regenerate])
 
   // Handle input change - now with access to the real setInput function!
   const { setDraftValue } = useChatDraft(chatId)
@@ -518,7 +518,7 @@ export function useChatCore({
     handleSubmit,
     status,
     error,
-    reload,
+    reload: regenerate,
     stop,
     setMessages,
     setInput,

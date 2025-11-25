@@ -67,7 +67,7 @@ function ResponseCard({ response, group }: ResponseCardProps) {
                 { type: "text", text: response.message.content },
               ]
             }
-            attachments={response.message.experimental_attachments}
+            attachments={response.message.attachments}
             onDelete={() => group.onDelete(response.model, response.message.id)}
             onEdit={(id, newText) => group.onEdit(response.model, id, newText)}
             onReload={() => group.onReload(response.model)}
@@ -142,7 +142,7 @@ export function MultiModelConversation({
                             { type: "text", text: group.userMessage.content },
                           ]
                         }
-                        attachments={group.userMessage.experimental_attachments}
+                        attachments={group.userMessage.attachments}
                         onDelete={() => {}}
                         onEdit={() => {}}
                         onReload={() => {}}

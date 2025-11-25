@@ -7,7 +7,7 @@ type MessageProps = {
   variant: MessageType["role"]
   children: string
   id: string
-  attachments?: MessageType["experimental_attachments"]
+  attachments?: MessageType["attachments"]
   isLast?: boolean
   onDelete: (id: string) => void
   onEdit: (id: string, newText: string) => Promise<void> | void

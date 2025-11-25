@@ -1,4 +1,4 @@
-import { Attachment } from "@ai-sdk/ui-utils"
+import { Attachment } from 'ai'
 
 export type Json =
   | string
@@ -144,7 +144,7 @@ export type Database = {
       }
       messages: {
         Row: {
-          experimental_attachments: Attachment[]
+          attachments: Attachment[]
           chat_id: string
           content: string | null
           created_at: string | null
@@ -156,7 +156,7 @@ export type Database = {
           model: string | null
         }
         Insert: {
-          experimental_attachments?: Attachment[]
+          attachments?: Attachment[]
           chat_id: string
           content: string | null
           created_at?: string | null
@@ -168,7 +168,7 @@ export type Database = {
           model?: string | null
         }
         Update: {
-          experimental_attachments?: Attachment[]
+          attachments?: Attachment[]
           chat_id?: string
           content?: string | null
           created_at?: string | null

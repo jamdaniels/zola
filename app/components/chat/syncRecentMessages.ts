@@ -1,10 +1,10 @@
 import { getLastMessagesFromDb } from "@/lib/chat-store/messages/api"
 import { writeToIndexedDB } from "@/lib/chat-store/persist"
-import type { Message as MessageAI } from "ai"
+import type { UIMessage as MessageAI } from "ai"
 
 export async function syncRecentMessages(
   chatId: string,
-  setMessages: (updater: (prev: MessageAI[]) => MessageAI[]) => void,
+  setMessages: (updater: (prev: undefined[]) => undefined[]) => void,
   count: number = 2
 ): Promise<void> {
   const lastFromDb = await getLastMessagesFromDb(chatId, count)

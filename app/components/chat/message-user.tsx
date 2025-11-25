@@ -35,7 +35,7 @@ const getTextFromDataUrl = (dataUrl: string) => {
 
 export type MessageUserProps = {
   hasScrollAnchor?: boolean
-  attachments?: MessageType["experimental_attachments"]
+  attachments?: MessageType["attachments"]
   children: string
   copied: boolean
   copyToClipboard: () => void

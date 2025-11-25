@@ -2,8 +2,8 @@ import { SYSTEM_PROMPT_DEFAULT } from "@/lib/config"
 import { getAllModels } from "@/lib/models"
 import { getProviderForModel } from "@/lib/openproviders/provider-map"
 import type { ProviderWithoutOllama } from "@/lib/user-keys"
-import { Attachment } from "@ai-sdk/ui-utils"
-import { Message as MessageAISDK, streamText, ToolSet } from "ai"
+import type { Attachment } from "@/lib/file-handling"
+import { streamText, type ToolSet, stepCountIs, type ModelMessage } from "ai";
 import {
   incrementMessageCount,
   logUserMessage,
@@ -15,7 +15,7 @@ import { createErrorResponse, extractErrorMessage } from "./utils"
 export const maxDuration = 60
 
 type ChatRequest = {
-  messages: MessageAISDK[]
+  messages: ModelMessage[]
   chatId: string
   userId: string
   model: string
@@ -74,12 +74,22 @@ export async function POST(req: Request) {
     }
 
     if (supabase && userMessage?.role === "user") {
+      // Extract content from ModelMessage parts
+      const content =
+        "content" in userMessage && typeof userMessage.content === "string"
+          ? userMessage.content
+          : "";
+      const attachments =
+        "experimental_attachments" in userMessage
+          ? (userMessage.experimental_attachments as Attachment[])
+          : undefined;
+
       await logUserMessage({
         supabase,
         userId,
         chatId,
-        content: userMessage.content,
-        attachments: userMessage.experimental_attachments as Attachment[],
+        content,
+        attachments,
         model,
         isAuthenticated,
         message_group_id,
@@ -109,7 +119,8 @@ export async function POST(req: Request) {
       system: effectiveSystemPrompt,
       messages: messages,
       tools: {} as ToolSet,
-      maxSteps: 10,
+      stopWhen: stepCountIs(10),
+
       onError: (err: unknown) => {
         console.error("Streaming error occurred:", err)
         // Don't set streamError anymore - let the AI SDK handle it through the stream
@@ -126,17 +137,16 @@ export async function POST(req: Request) {
             model,
           })
         }
-      },
+      }
     })
 
-    return result.toDataStreamResponse({
-      sendReasoning: true,
+    return result.toUIMessageStreamResponse({
       sendSources: true,
-      getErrorMessage: (error: unknown) => {
+      onError: (error: unknown) => {
         console.error("Error forwarded to client:", error)
         return extractErrorMessage(error)
       },
-    })
+    });
   } catch (err: unknown) {
     console.error("Error in /api/chat:", err)
     const error = err as {
